@@ -1,0 +1,4 @@
+#!/command/with-contenv sh
+
+source /app/.venv/bin/activate
+exec s6-setuidgid ledfx ledfx -c /app/ledfx $LEDFX_OPTS

@@ -1,3 +1,3 @@
 #!/command/with-contenv sh
 
-pipewire $PIPEWIRE_OPTS
+exec s6-setuidgid ledfx pipewire $PIPEWIRE_OPTS

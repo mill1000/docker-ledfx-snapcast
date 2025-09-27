@@ -41,13 +41,20 @@ COPY 10-wp-snapcast.conf /etc/wireplumber/wireplumber.conf.d/
 
 # Setup run directory
 RUN mkdir /app/ledfx && chmod 777 /app/ledfx
-RUN adduser -D -h /app ledfx
 
+# Setup user
+RUN adduser -D -h /app ledfx
+ENV HOME=/app/ledfx
+
+# Keep ENV between services
+ENV S6_KEEP_ENV=1
+
+# Service options
 ENV PIPEWIRE_RUNTIME_DIR=/tmp
 ENV PIPEWIRE_OPTS=""
 ENV WIREPLUMBER_OPTS=""
 ENV SNAPCAST_OPTS=""
 ENV LEDFX_OPTS=""
+
 ENTRYPOINT ["/init"]
-CMD ["/command/with-contenv", "sh", "-c", "source /app/.venv/bin/activate && ledfx -c /app/ledfx $LEDFX_OPTS"] 
  
