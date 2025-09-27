@@ -23,6 +23,9 @@ COPY --from=ledfx-build /app /app
 RUN apk add --update tini soxr libvorbis opus flac alsa-lib libgcc libstdc++ expat avahi-libs alsa-utils python3 aubio pipewire pipewire-alsa wireplumber pipewire-tools portaudio
 COPY 10-null-sink.conf /etc/pipewire/pipewire.conf.d/10-null-sink.conf
 COPY start.sh /app/start.sh
+RUN mkdir /app/ledfx && chmod 777 /app/ledfx
+RUN adduser -D -h /app/ledfx ledfx
+USER ledfx
 ENV PIPEWIRE_RUNTIME_DIR=/tmp
 ENV PIPEWIRE_OPTS=""
 ENV WIREPLUMBER_OPTS=""

@@ -8,4 +8,4 @@ wireplumber $WIREPLUMBER_OPTS&
 snapclient --player pipewire $SNAPCAST_OPTS& 
 
 # Start LedFX
-source /app/.venv/bin/activate && ledfx $LEDFX_OPTS
+source /app/.venv/bin/activate && ledfx -c /app/ledfx $LEDFX_OPTS
