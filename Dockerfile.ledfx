@@ -24,7 +24,7 @@ RUN apk add --update tini soxr libvorbis opus flac alsa-lib libgcc libstdc++ exp
 COPY 10-null-sink.conf /etc/pipewire/pipewire.conf.d/10-null-sink.conf
 COPY start.sh /app/start.sh
 RUN mkdir /app/ledfx && chmod 777 /app/ledfx
-RUN adduser -D -h /app/ledfx ledfx
+RUN adduser -D -h /app ledfx
 USER ledfx
 ENV PIPEWIRE_RUNTIME_DIR=/tmp
 ENV PIPEWIRE_OPTS=""
