@@ -1,0 +1,3 @@
+#!/command/with-contenv sh
+
+snapclient --player pipewire $SNAPCAST_OPTS

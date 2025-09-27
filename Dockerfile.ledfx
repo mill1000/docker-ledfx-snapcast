@@ -18,19 +18,36 @@ RUN python3 -m venv /app/.venv && source /app/.venv/bin/activate && CFLAGS="-Wno
 
 # Run image
 FROM alpine:latest
+
+# Copy built packages
 COPY --from=snapcast-build /snapcast-install /
 COPY --from=ledfx-build /app /app
-RUN apk add --update tini soxr libvorbis opus flac alsa-lib libgcc libstdc++ expat avahi-libs alsa-utils python3 aubio pipewire pipewire-alsa wireplumber pipewire-tools portaudio
-COPY 10-null-sink.conf /etc/pipewire/pipewire.conf.d/10-null-sink.conf
-COPY start.sh /app/start.sh
+
+# Install runtime dependencies
+RUN apk add --update xz soxr libvorbis opus flac alsa-lib libgcc libstdc++ expat avahi-libs alsa-utils python3 aubio pipewire pipewire-alsa wireplumber pipewire-tools portaudio
+
+# Setup s6-overlay
+ARG S6_OVERLAY_VERSION=3.2.1.0
+ARG S6_OVERLAY_ARCH=x86_64
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-${S6_OVERLAY_ARCH}.tar.xz
+COPY s6-rc.d /etc/s6-overlay/s6-rc.d
+
+# Copy pipewire/wireplumber configs
+COPY 10-pw-snapcast.conf /etc/pipewire/pipewire.conf.d/
+COPY 10-wp-snapcast.conf /etc/wireplumber/wireplumber.conf.d/
+
+# Setup run directory
 RUN mkdir /app/ledfx && chmod 777 /app/ledfx
 RUN adduser -D -h /app ledfx
-USER ledfx
+
 ENV PIPEWIRE_RUNTIME_DIR=/tmp
 ENV PIPEWIRE_OPTS=""
 ENV WIREPLUMBER_OPTS=""
 ENV SNAPCAST_OPTS=""
 ENV LEDFX_OPTS=""
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/bin/sh", "-c", "/app/start.sh"] 
+ENTRYPOINT ["/init"]
+CMD ["/command/with-contenv", "sh", "-c", "source /app/.venv/bin/activate && ledfx -c /app/ledfx $LEDFX_OPTS"] 
  
